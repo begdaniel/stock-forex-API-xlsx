@@ -1,4 +1,4 @@
-file_to_load = "stock-forex-API-xlsx.xlsx"
+file_to_load = "sfAx.xlsx"
 working_dir = False
 '''
 import openpyxl
