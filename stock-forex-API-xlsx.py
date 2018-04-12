@@ -193,17 +193,14 @@ def save_to_xlsx_file():
                 print("\nData NOT saved. Quitting.")
                 finished = True
 
+                
 '''
 EXECUTIVE PART STARTS HERE.
 '''
 
-
 # Create class instances.
 quote = Portfolio_data(excel_file[quote_sheet_name], quote_table_name)
-#quote.latest_previous_date = quote.get_latest_previous_date()
 forex = Portfolio_data(excel_file[forex_sheet_name], forex_table_name)
-#forex.latest_previous_date = forex.get_latest_previous_date()
-
 
 update_happened = False
 
@@ -213,12 +210,15 @@ for ws in [quote, forex]:
     ws.latest_previous_date = ws.get_latest_previous_date()
 
     if ws.latest_previous_date:
+        
         if ws.latest_previous_date < present:
+            
             print(f"\nLatest date in {ws.tableName} is {ws.latest_previous_date}.\nUpdating.")
             ws.insert_rows(2, ws.interval())
             ws.fill_date_column(ws.startdate())
             ws.set_date_type_for_date_column()
             ws.modify_table_range()
+            
             try:
                 fill_sheet(ws)
             except (KeyError, TypeError):
@@ -230,17 +230,18 @@ for ws in [quote, forex]:
                 print(e)
                 print(f"{ws.tableName} skipped.")
                 continue
+                
             update_happened = True
             print(f"{ws.tableName} filled.")
 
         elif ws.latest_previous_date == present:
             print(f"\nLatest date in {ws.tableName} is present date.\nUpdate skipped.")
 
-
         elif ws.latest_previous_date > present:
             ws.latest_previous_date = False
 
     if ws.latest_previous_date is False:
+        
         answer = False
         while answer not in ("c", "p"):
             answer = input(f"\nValue in cell {first_cell_of_date_column} in {ws.tableName} is '{ws.get_latest_previous_date()}'. "
@@ -248,10 +249,13 @@ for ws in [quote, forex]:
                            f"\nDo you want to: "
                            f"\n- Clear all data in {ws.tableName} and get new data, starting from a date of your input ( c ) "
                            f"\n - Pass ( p ) ?  ")
+        
         if answer == "p":
             print("Choice: Pass")
             continue
+            
         elif answer == "c":
+            
             date_input = input("Input starting date (YYYY-MM-DD) :  ")
             try:
                 ws.latest_previous_date = datetime.datetime.strptime(date_input, "%Y-%m-%d").date() - datetime.timedelta(
@@ -262,12 +266,14 @@ for ws in [quote, forex]:
             if ws.latest_previous_date >= present:
                 print("Date entered is a future date. Update skipped.")
                 continue
+                
             print("\nClearing sheet and updating.")
             ws.clear_date_column()
             ws.clear_numbers()
             ws.fill_date_column(ws.startdate())
             ws.set_date_type_for_date_column()
             ws.modify_table_range()
+            
             try:
                 fill_sheet(ws)
             except (KeyError, TypeError):
@@ -279,6 +285,7 @@ for ws in [quote, forex]:
                 print(e)
                 print(f"{ws.tableName} skipped.")
                 continue
+                
             update_happened = True
             print(f"{ws.tableName} filled.")
 
