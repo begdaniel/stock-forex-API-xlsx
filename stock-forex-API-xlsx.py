@@ -123,9 +123,10 @@ class Portfolio_data():
                         reference_date = str(self.sheet.cell(column=1, row=cell.row).value)
                         # Write quote for date in cell, if available.
                         if reference_date in quote_dates_list:
-                            cell.value = float(quote_data[reference_date]["4. close"])
+                            if quote_data[reference_date]["4. close"] != "0.0000":
+                                    cell.value = float(quote_data[reference_date]["4. close"])
                         # If cell is blank, try to get quote from the next cell
-                        elif cell.value == None:
+                        if cell.value == None:
                             cell.value = cell.offset(row=+1).value
 
     # Fills each row with a currency pair figure, corresponding to the reference date in col A.
@@ -142,9 +143,9 @@ class Portfolio_data():
         for row in self.sheet.iter_rows(min_row=2, min_col=2, max_col=3, max_row=self.interval() + 1):
             for cell in row:
                 if cell.column == 'B':
-                    cell.value = f"=ROUND($D{cell.row}/$E{cell.row}, 2)"
+                    cell.value = '=INDIRECT("RC[2]",0)/INDIRECT("RC[3]",0)'
                 elif cell.column == 'C':
-                    cell.value = f"=ROUND($D{cell.row}/$F{cell.row}, 2)"
+                    cell.value = '=INDIRECT("RC[1]",0)/INDIRECT("RC[3]",0)'
 
     # Latest date: ideally the date of the last update. Value of cell A2, in default.
     def get_latest_previous_date(self):
