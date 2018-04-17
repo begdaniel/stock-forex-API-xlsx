@@ -62,7 +62,7 @@ class Portfolio_data():
         n = 1
         for row in self.sheet.iter_rows(min_row=2, min_col=1, max_col=1, max_row=self.sheet.max_row):
             for cell in row:
-                if type(cell.value) is datetime.date:
+                if type(cell.value) is datetime.date or type(cell.value) is datetime.datetime:
                     n += 1
         return n
 
