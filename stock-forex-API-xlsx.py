@@ -115,19 +115,17 @@ class Portfolio_data():
             quote_dates_list = list(quote_data.keys())
 
             # This loop will repeat 7 times, so (blank) cells for weekend days get written the last available data.
-            for i in range(7):
-                for row in self.sheet.iter_rows(min_row=2, min_col=colnum, max_col=colnum,
-                                                    max_row=self.interval() + 1):
-                    for cell in row:
-                        # Get the reference date from col A.
-                        reference_date = str(self.sheet.cell(column=1, row=cell.row).value)
-                        # Write quote for date in cell, if available.
-                        if reference_date in quote_dates_list:
-                            if quote_data[reference_date]["4. close"] != "0.0000":
-                                    cell.value = float(quote_data[reference_date]["4. close"])
-                        # If cell is blank, try to get quote from the next cell
-                        if cell.value == None:
-                            cell.value = cell.offset(row=+1).value
+            for row in self.sheet.iter_rows(min_row=2, min_col=colnum, max_col=colnum,
+                                                max_row=self.interval() + 1):
+                for cell in row:
+                    # Get the reference date from col A.
+                    reference_date = str(self.sheet.cell(column=1, row=cell.row).value)
+                    # Write quote for date in cell, if available and non-zero.
+                    if reference_date in quote_dates_list and quote_data[reference_date]["4. close"] != "0.0000":
+                        cell.value = float(quote_data[reference_date]["4. close"])
+                    # If cell is blank, enter a formula to get value from next cell.
+                    else:
+                        cell.value = '=INDIRECT("R[1]C",0)'
 
     # Fills each row with a currency pair figure, corresponding to the reference date in col A.
     def fill_forex_sheet(self):
@@ -178,7 +176,7 @@ def fill_sheet(ws):
 def save_to_xlsx_file():
     filename = file_to_load
 
-    answer = input("OK to overwrite original file: {filename}, or save as another name? ( y / n ) ")
+    answer = input(f"OK to overwrite original file: {filename}, or save as another name? ( y / n ) ")
     if answer not in ("y", " ", ""):
         filename = input("Input filename (with .xlsx) to save: ")
 
