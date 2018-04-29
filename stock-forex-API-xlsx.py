@@ -163,6 +163,11 @@ class Portfolio_data():
     def interval(self):
         return (present - self.startdate() + datetime.timedelta(days=1)).days
 
+def try_connection(ws):
+    if ws == quote:
+        get_quote_json('SPY')
+    elif ws == forex:
+        get_forex_json(str(ws.get_latest_previous_date()))
 
 # Fills cells in column B-- ,with online data.
 def fill_sheet(ws):
@@ -205,6 +210,14 @@ update_happened = False
 
 # Check if latest date is earlier than today, decide to update or pass.
 for ws in [quote, forex]:
+    
+    # Check server connection.
+    try:
+        try_connection(ws)
+    except Exception as e:
+        print(e)
+        print(f"\nERROR connecting to API for {ws.tableName}. Update skipped.")
+        continue
 
     ws.latest_previous_date = ws.get_latest_previous_date()
 
